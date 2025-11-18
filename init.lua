@@ -47,11 +47,12 @@ end)
 local apps = {
   -- Common apps (customize these!)
   ["H"] = "Google Chrome",
-  ["V"] = "Slack",
+  ["T"] = "Messages",
   ["S"] = "Ghostty",
   ["N"] = "Cursor",
+  ["V"] = "GitHub Desktop",
   ["R"] = "1Password",
-  ["M"] = "Zoom",
+  ["M"] = "WhatsApp",
   ["F"] = "Finder",
   ["P"] = "Notion Calendar"
 }

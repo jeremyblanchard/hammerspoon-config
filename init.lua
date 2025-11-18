@@ -14,6 +14,11 @@ hs.hotkey.bind({"cmd", "alt", "ctrl"}, "R", function()
 end)
 
 --------------------------------------------------------------------------------
+-- SMOOTH SCROLLING
+--------------------------------------------------------------------------------
+require("scroll")
+
+--------------------------------------------------------------------------------
 -- WINDOW MANAGEMENT - Move Between Monitors
 --------------------------------------------------------------------------------
 
@@ -41,20 +46,33 @@ end)
 -- APPLICATION SWITCHING
 --------------------------------------------------------------------------------
 
--- Define your apps here - customize these to your needs
--- Format: ["key"] = "Application Name" or "com.bundle.id"
+-- Load machine-specific app configuration
+local function loadApps()
+  -- Try to load machine-local config (gitignored)
+  local success, config = pcall(require, "machine-local")
+  local profile = "work"  -- default
 
-local apps = {
-  -- Common apps (customize these!)
-  ["H"] = "Google Chrome",
-  ["V"] = "Slack",
-  ["S"] = "Ghostty",
-  ["N"] = "Cursor",
-  ["R"] = "1Password",
-  ["M"] = "Zoom",
-  ["F"] = "Finder",
-  ["P"] = "Notion Calendar"
-}
+  if success and config.profile then
+    profile = config.profile
+    print("Loading apps profile: " .. profile)
+  else
+    print("No machine-local.lua found, using work profile")
+  end
+
+  -- Load the appropriate apps file
+  local apps_file = "apps-" .. profile
+  local apps_success, apps = pcall(require, apps_file)
+
+  if apps_success then
+    print("Loaded " .. apps_file .. ".lua")
+    return apps
+  else
+    print("ERROR: Could not load " .. apps_file .. ".lua")
+    return {}
+  end
+end
+
+local apps = loadApps()
 
 -- Create hotkeys for all apps using Cmd+Alt+Key
 for key, app in pairs(apps) do
@@ -83,6 +101,43 @@ for key, app in pairs(apps) do
     toggleApp(app)
   end)
 end
+
+--------------------------------------------------------------------------------
+-- ZOOM AUDIO TOGGLE
+--------------------------------------------------------------------------------
+
+-- Toggle Zoom audio (mute/unmute) with TAB (hyper/Cmd+Alt) + A
+-- Works even when Zoom is not the active app
+hs.hotkey.bind({"cmd", "alt", "shift"}, "a", function()
+  -- Try multiple possible Zoom identifiers
+  local zoom = hs.application.find("zoom.us") or
+               hs.application.find("Zoom") or
+               hs.application.find("us.zoom.xos")
+
+  if zoom then
+    print("Found Zoom app: " .. zoom:name() .. " (bundle: " .. (zoom:bundleID() or "unknown") .. ")")
+
+    -- Activate Zoom, send keystroke, then return to previous app
+    local currentApp = hs.application.frontmostApplication()
+    zoom:activate()
+    hs.timer.usleep(50000) -- Wait 50ms for activation
+    hs.eventtap.keyStroke({"cmd", "shift"}, "a")
+    hs.timer.usleep(50000) -- Wait 50ms for keystroke
+    if currentApp then
+      currentApp:activate()
+    end
+    hs.notify.new({title="Zoom", informativeText="Audio toggled"}):send()
+  else
+    -- Debug: list all running apps
+    print("Zoom not found. Running apps:")
+    for _, app in ipairs(hs.application.runningApplications()) do
+      if app:name():lower():find("zoom") then
+        print("  Found: " .. app:name() .. " (bundle: " .. (app:bundleID() or "unknown") .. ")")
+      end
+    end
+    hs.notify.new({title="Zoom", informativeText="Zoom is not running"}):send()
+  end
+end)
 
 --------------------------------------------------------------------------------
 -- UTILITY FUNCTIONS

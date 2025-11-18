@@ -10,5 +10,6 @@ return {
   ["R"] = "1Password",
   ["M"] = "zoom.us",
   ["F"] = "Finder",
-  ["P"] = "Notion Calendar"
+  ["P"] = "Notion Calendar",
+  ["Q"] = "System Settings"
 }

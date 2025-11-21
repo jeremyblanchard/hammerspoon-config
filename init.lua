@@ -106,9 +106,9 @@ end
 -- ZOOM AUDIO TOGGLE
 --------------------------------------------------------------------------------
 
--- Toggle Zoom audio (mute/unmute) with TAB (hyper/Cmd+Alt) + A
+-- Toggle Zoom audio (mute/unmute) with TAB (hyper/Cmd+Alt) + U
 -- Works even when Zoom is not the active app
-hs.hotkey.bind({"cmd", "alt", "shift"}, "a", function()
+hs.hotkey.bind({"cmd", "alt", "shift"}, "U", function()
   -- Try multiple possible Zoom identifiers
   local zoom = hs.application.find("zoom.us") or
                hs.application.find("Zoom") or
@@ -121,7 +121,7 @@ hs.hotkey.bind({"cmd", "alt", "shift"}, "a", function()
     local currentApp = hs.application.frontmostApplication()
     zoom:activate()
     hs.timer.usleep(50000) -- Wait 50ms for activation
-    hs.eventtap.keyStroke({"cmd", "shift"}, "a")
+    hs.eventtap.keyStroke({"cmd", "shift"}, "A")
     hs.timer.usleep(50000) -- Wait 50ms for keystroke
     if currentApp then
       currentApp:activate()

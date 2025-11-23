@@ -2,14 +2,14 @@
 -- Format: ["key"] = "Application Name" or "com.bundle.id"
 
 return {
-  ["C"] = "Google Chrome",
-  ["I"] = "Messages",
-  ["E"] = "Ghostty",
-  ["A"] = "Cursor",
-  ["B"] = "GitHub Desktop",
-  ["G"] = "1Password",
-  ["X"] = "WhatsApp",
-  ["J"] = "Finder",
-  ["K"] = "Notion Calendar",
-  ["Y"] = "System Settings"
+  ["A"] = "Google Chrome",
+  ["S"] = "Messages",
+  ["D"] = "Ghostty",
+  ["F"] = "Cursor",
+  ["G"] = "GitHub Desktop",
+  ["X"] = "1Password",
+  ["C"] = "WhatsApp",
+  ["V"] = "Finder",
+  ["B"] = "Notion Calendar",
+  ["W"] = "System Settings"
 }

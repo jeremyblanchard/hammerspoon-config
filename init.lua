@@ -108,7 +108,7 @@ end
 
 -- Toggle Zoom audio (mute/unmute) with TAB (hyper/Cmd+Alt) + U
 -- Works even when Zoom is not the active app
-hs.hotkey.bind({"cmd", "alt", "shift"}, "U", function()
+hs.hotkey.bind({"cmd", "alt", "shift"}, "T", function()
   -- Try multiple possible Zoom identifiers
   local zoom = hs.application.find("zoom.us") or
                hs.application.find("Zoom") or

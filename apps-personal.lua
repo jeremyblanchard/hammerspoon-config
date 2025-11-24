@@ -7,9 +7,9 @@ return {
   ["D"] = "Ghostty",
   ["F"] = "Cursor",
   ["G"] = "GitHub Desktop",
+  ["Z"] = "WhatsApp",
   ["X"] = "1Password",
-  ["C"] = "WhatsApp",
-  ["V"] = "Finder",
-  ["B"] = "Notion Calendar",
-  ["W"] = "System Settings"
+  ["C"] = "Finder",
+  ["V"] = "Notion Calendar",
+  ["B"] = "System Settings"
 }

@@ -8,7 +8,7 @@ return {
   ["F"] = "Cursor",
   ["G"] = "GitHub Desktop",
   ["Z"] = "WhatsApp",
-  ["X"] = "1Password",
+  ["X"] = "Xcode",
   ["C"] = "Finder",
   ["V"] = "Notion Calendar",
   ["B"] = "System Settings"

@@ -2,13 +2,14 @@
 -- Place this in ~/.hammerspoon/init.lua or require it from there
 --
 -- SETUP:
--- 1. Copy this to ~/.hammerspoon/init.lua (or require it)
--- 2. Reload Hammerspoon config
--- 3. In Granola: Copy meeting note text
--- 4. Press Cmd+Shift+G to process and save
+-- 1. Set OPENAI_API_KEY environment variable
+-- 2. Copy this to ~/.hammerspoon/granola.lua and require from init.lua
+-- 3. Reload Hammerspoon config
+-- 4. In Granola: Copy meeting note text
+-- 5. Press Hyper+O (Cmd+Ctrl+Alt+Shift+O) to process and save
 --
 -- WORKFLOW:
--- Granola "Copy text" → Clipboard → Cmd+Shift+G → Saved to Obsidian Inbox
+-- Granola "Copy text" → Clipboard → Hyper+O → AI synthesis → Saved to Obsidian Inbox
 
 local obsidianPath = os.getenv("HOME") .. "/Documents/Obsidian/Inbox/"
 
@@ -83,7 +84,7 @@ local function processGranolaNoteBasic()
     end
 end
 
--- Function to process with Claude synthesis (requires Claude API key)
+-- Function to process with AI synthesis (requires OpenAI API key)
 local function processGranolaNoteWithClaude()
     local clipboardText = hs.pasteboard.getContents()
 
@@ -92,19 +93,19 @@ local function processGranolaNoteWithClaude()
         return
     end
 
-    hs.alert.show("🤖 Processing with Claude...")
+    hs.alert.show("🤖 Processing with AI...")
 
     -- Get API key from environment or keychain
-    local apiKey = os.getenv("ANTHROPIC_API_KEY")
+    local apiKey = os.getenv("OPENAI_API_KEY")
 
     if not apiKey then
-        hs.alert.show("❌ ANTHROPIC_API_KEY not set")
+        hs.alert.show("❌ OPENAI_API_KEY not set")
         -- Fall back to basic processing
         processGranolaNoteBasic()
         return
     end
 
-    -- Create Claude API request
+    -- Create OpenAI API request
     local prompt = string.format([[Analyze this Granola meeting transcript and create a structured summary:
 
 1. Extract the meeting title/topic
@@ -119,12 +120,11 @@ Transcript:
 %s]], clipboardText)
 
     local curlCommand = string.format([[
-curl -s https://api.anthropic.com/v1/messages \
-  -H "content-type: application/json" \
-  -H "x-api-key: %s" \
-  -H "anthropic-version: 2023-06-01" \
+curl -s https://api.openai.com/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer %s" \
   -d '{
-    "model": "claude-3-5-sonnet-20241022",
+    "model": "gpt-4o",
     "max_tokens": 2048,
     "messages": [{"role": "user", "content": %s}]
   }'
@@ -133,10 +133,10 @@ curl -s https://api.anthropic.com/v1/messages \
     -- Execute async
     hs.task.new("/bin/bash", function(exitCode, stdOut, stdErr)
         if exitCode == 0 then
-            -- Parse response
+            -- Parse response (OpenAI format)
             local success, response = pcall(hs.json.decode, stdOut)
-            if success and response.content and response.content[1] then
-                local synthesis = response.content[1].text
+            if success and response.choices and response.choices[1] and response.choices[1].message then
+                local synthesis = response.choices[1].message.content
 
                 -- Create title from synthesis
                 local title = synthesis:match("# ([^\n]+)") or sanitizeFilename(clipboardText)
@@ -158,11 +158,11 @@ curl -s https://api.anthropic.com/v1/messages \
                     hs.alert.show("❌ Error saving file")
                 end
             else
-                hs.alert.show("❌ Claude API error")
+                hs.alert.show("❌ OpenAI API error")
                 processGranolaNoteBasic()
             end
         else
-            hs.alert.show("❌ Claude API failed")
+            hs.alert.show("❌ OpenAI API failed")
             processGranolaNoteBasic()
         end
     end, {"-c", curlCommand}):start()

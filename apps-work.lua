@@ -5,11 +5,12 @@ return {
   ["A"] = "Google Chrome",
   ["S"] = "Slack",
   ["D"] = "Ghostty",
-  ["F"] = "Cursor",
+  ["F"] = "Zed",
   ["G"] = "GitHub Desktop",
   ["Z"] = "zoom.us",
   ["X"] = "1Password",
   ["C"] = "Finder",
   ["V"] = "Notion Calendar",
-  ["B"] = "System Settings"
+  ["B"] = "System Settings",
+  ["O"] = "Obsidian"
 }

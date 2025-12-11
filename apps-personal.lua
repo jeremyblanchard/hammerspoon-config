@@ -5,7 +5,7 @@ return {
   ["A"] = "Google Chrome",
   ["S"] = "Messages",
   ["D"] = "Ghostty",
-  ["F"] = "Cursor",
+  ["F"] = "Zed",
   ["G"] = "GitHub Desktop",
   ["Z"] = "WhatsApp",
   ["X"] = "Xcode",

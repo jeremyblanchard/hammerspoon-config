@@ -140,6 +140,43 @@ hs.hotkey.bind({"cmd", "alt", "shift"}, "T", function()
 end)
 
 --------------------------------------------------------------------------------
+-- ZOOM VIDEO TOGGLE
+--------------------------------------------------------------------------------
+
+-- Toggle Zoom video (on/off) with Hyper + Y
+-- Works even when Zoom is not the active app
+hs.hotkey.bind({"cmd", "alt", "shift"}, "Y", function()
+  -- Try multiple possible Zoom identifiers
+  local zoom = hs.application.find("zoom.us") or
+               hs.application.find("Zoom") or
+               hs.application.find("us.zoom.xos")
+
+  if zoom then
+    print("Found Zoom app: " .. zoom:name() .. " (bundle: " .. (zoom:bundleID() or "unknown") .. ")")
+
+    -- Activate Zoom, send keystroke, then return to previous app
+    local currentApp = hs.application.frontmostApplication()
+    zoom:activate()
+    hs.timer.usleep(50000) -- Wait 50ms for activation
+    hs.eventtap.keyStroke({"cmd", "shift"}, "V")
+    hs.timer.usleep(50000) -- Wait 50ms for keystroke
+    if currentApp then
+      currentApp:activate()
+    end
+    hs.notify.new({title="Zoom", informativeText="Video toggled"}):send()
+  else
+    -- Debug: list all running apps
+    print("Zoom not found. Running apps:")
+    for _, app in ipairs(hs.application.runningApplications()) do
+      if app:name():lower():find("zoom") then
+        print("  Found: " .. app:name() .. " (bundle: " .. (app:bundleID() or "unknown") .. ")")
+      end
+    end
+    hs.notify.new({title="Zoom", informativeText="Zoom is not running"}):send()
+  end
+end)
+
+--------------------------------------------------------------------------------
 -- UTILITY FUNCTIONS
 --------------------------------------------------------------------------------
 

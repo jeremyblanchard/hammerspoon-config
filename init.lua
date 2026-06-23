@@ -106,46 +106,16 @@ end
 -- ZOOM AUDIO TOGGLE
 --------------------------------------------------------------------------------
 
--- Toggle Zoom audio (mute/unmute) with Hyper + E
--- Uses the same AppleScript/System Events flow that works from Terminal:
--- activate Zoom, send Shift+Cmd+A, then restore the previous app.
-local function toggleZoomAudio()
-  local script = [[
-    tell application "System Events"
-      set previousApp to first application process whose frontmost is true
-      set previousAppName to name of previousApp
-    end tell
-
-    tell application "zoom.us" to activate
-    delay 0.3
-
-    tell application "System Events"
-      keystroke "a" using {command down, shift down}
-    end tell
-
-    delay 0.2
-
-    if previousAppName is not "zoom.us" then
-      try
-        tell application previousAppName to activate
-      end try
-    end if
-
-    return "Sent Shift+Cmd+A to Zoom from " & previousAppName
-  ]]
-
-  local ok, result = hs.osascript.applescript(script)
-
-  if ok then
-    print(result)
-    hs.notify.new({title="Zoom", informativeText="Audio toggled"}):send()
-  else
-    print("Zoom audio toggle failed: " .. tostring(result))
-    hs.notify.new({title="Zoom", informativeText="Audio toggle failed"}):send()
-  end
+-- Map Hyper+E to Cmd+Shift+A.
+-- With Zoom's native global shortcut enabled for mute/unmute, this toggles audio
+-- without activating Zoom or changing focus.
+local function sendZoomAudioShortcut()
+  hs.eventtap.keyStroke({"cmd", "shift"}, "A")
+  print("Mapped Hyper+E to Cmd+Shift+A")
+  hs.notify.new({title="Zoom", informativeText="Audio shortcut sent"}):send()
 end
 
-hs.hotkey.bind({"cmd", "alt", "shift"}, "E", toggleZoomAudio)
+hs.hotkey.bind({"cmd", "alt", "shift"}, "E", sendZoomAudioShortcut)
 
 --------------------------------------------------------------------------------
 -- ZOOM VIDEO TOGGLE

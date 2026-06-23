@@ -8,7 +8,7 @@ Personal Hammerspoon configuration for macOS automation, window management, and 
 - **Window Management**: Move windows between monitors with `Alt+Ctrl+Up/Down`
 - **App Switching**: Quick app launcher with `Cmd+Alt+[Key]`
 - **Toggle Apps**: Hide/show apps with `Cmd+Alt+Shift+[Key]`
-- **Zoom Audio Toggle**: `Cmd+Alt+Shift+A` to mute/unmute Zoom
+- **Zoom Audio Toggle**: `Cmd+Alt+Shift+E` / Hyper+E to mute/unmute Zoom
 - **Config Reload**: `Cmd+Alt+Ctrl+R` to reload configuration
 
 ## Installation

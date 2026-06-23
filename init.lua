@@ -106,38 +106,46 @@ end
 -- ZOOM AUDIO TOGGLE
 --------------------------------------------------------------------------------
 
--- Toggle Zoom audio (mute/unmute) with TAB (hyper/Cmd+Alt) + U
--- Works even when Zoom is not the active app
-hs.hotkey.bind({"cmd", "alt", "shift"}, "T", function()
-  -- Try multiple possible Zoom identifiers
-  local zoom = hs.application.find("zoom.us") or
-               hs.application.find("Zoom") or
-               hs.application.find("us.zoom.xos")
+-- Toggle Zoom audio (mute/unmute) with Hyper + E
+-- Uses the same AppleScript/System Events flow that works from Terminal:
+-- activate Zoom, send Shift+Cmd+A, then restore the previous app.
+local function toggleZoomAudio()
+  local script = [[
+    tell application "System Events"
+      set previousApp to first application process whose frontmost is true
+      set previousAppName to name of previousApp
+    end tell
 
-  if zoom then
-    print("Found Zoom app: " .. zoom:name() .. " (bundle: " .. (zoom:bundleID() or "unknown") .. ")")
+    tell application "zoom.us" to activate
+    delay 0.3
 
-    -- Activate Zoom, send keystroke, then return to previous app
-    local currentApp = hs.application.frontmostApplication()
-    zoom:activate()
-    hs.timer.usleep(50000) -- Wait 50ms for activation
-    hs.eventtap.keyStroke({"cmd", "shift"}, "A")
-    hs.timer.usleep(50000) -- Wait 50ms for keystroke
-    if currentApp then
-      currentApp:activate()
-    end
+    tell application "System Events"
+      keystroke "a" using {command down, shift down}
+    end tell
+
+    delay 0.2
+
+    if previousAppName is not "zoom.us" then
+      try
+        tell application previousAppName to activate
+      end try
+    end if
+
+    return "Sent Shift+Cmd+A to Zoom from " & previousAppName
+  ]]
+
+  local ok, result = hs.osascript.applescript(script)
+
+  if ok then
+    print(result)
     hs.notify.new({title="Zoom", informativeText="Audio toggled"}):send()
   else
-    -- Debug: list all running apps
-    print("Zoom not found. Running apps:")
-    for _, app in ipairs(hs.application.runningApplications()) do
-      if app:name():lower():find("zoom") then
-        print("  Found: " .. app:name() .. " (bundle: " .. (app:bundleID() or "unknown") .. ")")
-      end
-    end
-    hs.notify.new({title="Zoom", informativeText="Zoom is not running"}):send()
+    print("Zoom audio toggle failed: " .. tostring(result))
+    hs.notify.new({title="Zoom", informativeText="Audio toggle failed"}):send()
   end
-end)
+end
+
+hs.hotkey.bind({"cmd", "alt", "shift"}, "E", toggleZoomAudio)
 
 --------------------------------------------------------------------------------
 -- ZOOM VIDEO TOGGLE

@@ -75,23 +75,24 @@ end
 local apps = loadApps()
 
 -- Holding the keyboard's Tab key activates its dedicated App layer. Each app
--- position sends Cmd+Ctrl+Alt plus a function key from F13 through F24.
--- This private synthetic namespace avoids macOS and application shortcuts.
+-- position sends a synthetic shortcut using F13 through F20. The shifted bank
+-- provides additional signals because macOS does not expose F21 through F24 as
+-- bindable virtual keycodes.
 local appSignalMods = {"cmd", "ctrl", "alt"}
-local zoomSignalMods = {"cmd", "ctrl", "alt", "shift"}
+local shiftedSignalMods = {"cmd", "ctrl", "alt", "shift"}
 local appSignals = {
-  ["A"] = "F13",
-  ["S"] = "F14",
-  ["D"] = "F15",
-  ["F"] = "F16",
-  ["G"] = "F17",
-  ["Z"] = "F18",
-  ["X"] = "F19",
-  ["C"] = "F20",
-  ["V"] = "F21",
-  ["B"] = "F22",
-  ["O"] = "F23",
-  ["L"] = "F24"
+  ["A"] = {key = "F13", shifted = false},
+  ["S"] = {key = "F14", shifted = false},
+  ["D"] = {key = "F15", shifted = false},
+  ["F"] = {key = "F16", shifted = false},
+  ["G"] = {key = "F17", shifted = false},
+  ["Z"] = {key = "F18", shifted = false},
+  ["X"] = {key = "F19", shifted = false},
+  ["C"] = {key = "F20", shifted = false},
+  ["V"] = {key = "F15", shifted = true},
+  ["B"] = {key = "F16", shifted = true},
+  ["O"] = {key = "F17", shifted = true},
+  ["L"] = {key = "F18", shifted = true}
 }
 
 local function warnIfSystemAssigned(mods, key, description)
@@ -107,8 +108,9 @@ local function bindAppSignal(key, app)
     return
   end
 
-  warnIfSystemAssigned(appSignalMods, signal, "app signal " .. signal)
-  hs.hotkey.bind(appSignalMods, signal, function()
+  local mods = signal.shifted and shiftedSignalMods or appSignalMods
+  warnIfSystemAssigned(mods, signal.key, "app signal " .. signal.key)
+  hs.hotkey.bind(mods, signal.key, function()
     hs.application.launchOrFocus(app)
   end)
 end
@@ -130,8 +132,8 @@ local function sendZoomAudioShortcut()
   hs.notify.new({title="Zoom", informativeText="Audio shortcut sent"}):send()
 end
 
-warnIfSystemAssigned(zoomSignalMods, "F13", "Zoom audio signal Shift+F13")
-hs.hotkey.bind(zoomSignalMods, "F13", sendZoomAudioShortcut)
+warnIfSystemAssigned(shiftedSignalMods, "F13", "Zoom audio signal Shift+F13")
+hs.hotkey.bind(shiftedSignalMods, "F13", sendZoomAudioShortcut)
 
 --------------------------------------------------------------------------------
 -- ZOOM VIDEO TOGGLE
@@ -139,8 +141,8 @@ hs.hotkey.bind(zoomSignalMods, "F13", sendZoomAudioShortcut)
 
 -- App-layer Y sends Cmd+Ctrl+Alt+Shift+F14 to toggle Zoom video.
 -- Works even when Zoom is not the active app.
-warnIfSystemAssigned(zoomSignalMods, "F14", "Zoom video signal Shift+F14")
-hs.hotkey.bind(zoomSignalMods, "F14", function()
+warnIfSystemAssigned(shiftedSignalMods, "F14", "Zoom video signal Shift+F14")
+hs.hotkey.bind(shiftedSignalMods, "F14", function()
   -- Try multiple possible Zoom identifiers
   local zoom = hs.application.find("zoom.us") or
                hs.application.find("Zoom") or

@@ -9,7 +9,7 @@ Personal Hammerspoon configuration for macOS automation, window management, and 
 - **App Switching**: Hold `Tab` and press an app key to launch or focus it
 - **Zoom Audio Toggle**: `Tab+E` maps to `Cmd+Shift+A` for Zoom's native global mute/unmute shortcut
 - **Zoom Video Toggle**: `Tab+Y` toggles Zoom video without leaving the current app
-- **Private App Namespace**: The keyboard App layer sends synthetic `Cmd+Ctrl+Alt+F13–F24` shortcuts to avoid collisions
+- **Private App Namespace**: The keyboard App layer sends synthetic modified `F13–F20` shortcuts to avoid collisions
 - **Config Reload**: `Cmd+Alt+Ctrl+R` to reload configuration
 
 ## Installation

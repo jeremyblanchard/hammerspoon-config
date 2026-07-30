@@ -6,10 +6,10 @@ Personal Hammerspoon configuration for macOS automation, window management, and 
 
 - **Smooth Scrolling**: Keyboard-based scrolling with `Ctrl+Cmd+Opt+Arrow` keys
 - **Window Management**: Move windows between monitors with `Alt+Ctrl+Up/Down`
-- **App Switching**: Press `Hyper+Space`, release, then press an app key to launch or focus it
-- **Zoom Audio Toggle**: `Hyper+E` maps to `Cmd+Shift+A` for Zoom's native global mute/unmute shortcut
-- **Zoom Video Toggle**: `Hyper+Y` toggles Zoom video without leaving the current app
-- **True Hyper**: The keyboard's held Tab key sends `Cmd+Ctrl+Alt+Shift`
+- **App Switching**: Hold `Tab` and press an app key to launch or focus it
+- **Zoom Audio Toggle**: `Tab+E` maps to `Cmd+Shift+A` for Zoom's native global mute/unmute shortcut
+- **Zoom Video Toggle**: `Tab+Y` toggles Zoom video without leaving the current app
+- **Private App Namespace**: The keyboard App layer sends synthetic `Cmd+Ctrl+Alt+F13–F24` shortcuts to avoid collisions
 - **Config Reload**: `Cmd+Alt+Ctrl+R` to reload configuration
 
 ## Installation
@@ -36,11 +36,13 @@ Personal Hammerspoon configuration for macOS automation, window management, and 
 Edit `apps-work.lua` or `apps-personal.lua`:
 ```lua
 return {
-  ["H"] = "Google Chrome",  -- Hyper+Space, then H
-  ["T"] = "Slack",          -- Hyper+Space, then T
-  -- Add more apps...
+  ["A"] = "Google Chrome",  -- Tab+A
+  ["S"] = "Slack",          -- Tab+S
+  -- Add more apps using an App-layer key...
 }
 ```
+
+Supported App-layer keys are `A`, `S`, `D`, `F`, `G`, `Z`, `X`, `C`, `V`, `B`, `O`, and `L`. The keyboard reserves `E` and `Y` for Zoom audio and video.
 
 ### Scroll Speed
 

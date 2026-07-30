@@ -74,67 +74,73 @@ end
 
 local apps = loadApps()
 
--- The keyboard's held Tab key sends true Hyper: Cmd+Ctrl+Alt+Shift.
--- Hyper+Space enters app mode; release the chord, then press an app key.
--- The mode exits after a selection or after two seconds.
-local hyper = {"cmd", "ctrl", "alt", "shift"}
-local appMode = hs.hotkey.modal.new(hyper, "space")
-local appModeTimer = nil
+-- Holding the keyboard's Tab key activates its dedicated App layer. Each app
+-- position sends Cmd+Ctrl+Alt plus a function key from F13 through F24.
+-- This private synthetic namespace avoids macOS and application shortcuts.
+local appSignalMods = {"cmd", "ctrl", "alt"}
+local zoomSignalMods = {"cmd", "ctrl", "alt", "shift"}
+local appSignals = {
+  ["A"] = "F13",
+  ["S"] = "F14",
+  ["D"] = "F15",
+  ["F"] = "F16",
+  ["G"] = "F17",
+  ["Z"] = "F18",
+  ["X"] = "F19",
+  ["C"] = "F20",
+  ["V"] = "F21",
+  ["B"] = "F22",
+  ["O"] = "F23",
+  ["L"] = "F24"
+}
 
-local function stopAppModeTimer()
-  if appModeTimer then
-    appModeTimer:stop()
-    appModeTimer = nil
+local function warnIfSystemAssigned(mods, key, description)
+  if hs.hotkey.systemAssigned(mods, key) then
+    print("WARNING: macOS has assigned " .. description)
   end
 end
 
-appMode.entered = function()
-  stopAppModeTimer()
-  print("App mode entered")
-  appModeTimer = hs.timer.doAfter(2, function()
-    appModeTimer = nil
-    appMode:exit()
-  end)
-end
+local function bindAppSignal(key, app)
+  local signal = appSignals[key]
+  if not signal then
+    print("WARNING: No keyboard App-layer signal configured for " .. key .. " (" .. app .. ")")
+    return
+  end
 
-appMode.exited = function()
-  stopAppModeTimer()
-  print("App mode exited")
+  warnIfSystemAssigned(appSignalMods, signal, "app signal " .. signal)
+  hs.hotkey.bind(appSignalMods, signal, function()
+    hs.application.launchOrFocus(app)
+  end)
 end
 
 for key, app in pairs(apps) do
-  appMode:bind({}, key, function()
-    hs.application.launchOrFocus(app)
-    appMode:exit()
-  end)
+  bindAppSignal(key, app)
 end
-
-appMode:bind({}, "escape", function()
-  appMode:exit()
-end)
 
 --------------------------------------------------------------------------------
 -- ZOOM AUDIO TOGGLE
 --------------------------------------------------------------------------------
 
--- Map true Hyper+E to Cmd+Shift+A.
+-- App-layer E sends Cmd+Ctrl+Alt+Shift+F13. Map it to Cmd+Shift+A.
 -- With Zoom's native global shortcut enabled for mute/unmute, this toggles audio
 -- without activating Zoom or changing focus.
 local function sendZoomAudioShortcut()
   hs.eventtap.keyStroke({"cmd", "shift"}, "A")
-  print("Mapped Hyper+E to Cmd+Shift+A")
+  print("Mapped App-layer E to Cmd+Shift+A")
   hs.notify.new({title="Zoom", informativeText="Audio shortcut sent"}):send()
 end
 
-hs.hotkey.bind(hyper, "E", sendZoomAudioShortcut)
+warnIfSystemAssigned(zoomSignalMods, "F13", "Zoom audio signal Shift+F13")
+hs.hotkey.bind(zoomSignalMods, "F13", sendZoomAudioShortcut)
 
 --------------------------------------------------------------------------------
 -- ZOOM VIDEO TOGGLE
 --------------------------------------------------------------------------------
 
--- Toggle Zoom video (on/off) with true Hyper+Y.
+-- App-layer Y sends Cmd+Ctrl+Alt+Shift+F14 to toggle Zoom video.
 -- Works even when Zoom is not the active app.
-hs.hotkey.bind(hyper, "Y", function()
+warnIfSystemAssigned(zoomSignalMods, "F14", "Zoom video signal Shift+F14")
+hs.hotkey.bind(zoomSignalMods, "F14", function()
   -- Try multiple possible Zoom identifiers
   local zoom = hs.application.find("zoom.us") or
                hs.application.find("Zoom") or

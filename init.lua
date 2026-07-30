@@ -74,39 +74,50 @@ end
 
 local apps = loadApps()
 
--- Create hotkeys for all apps using Cmd+Alt+Key
-for key, app in pairs(apps) do
-  hs.hotkey.bind({"cmd", "alt"}, key, function()
-    hs.application.launchOrFocus(app)
-  end)
-end
+-- The keyboard's held Tab key sends true Hyper: Cmd+Ctrl+Alt+Shift.
+-- Hyper+Space enters app mode; release the chord, then press an app key.
+-- The mode exits after a selection or after two seconds.
+local hyper = {"cmd", "ctrl", "alt", "shift"}
+local appMode = hs.hotkey.modal.new(hyper, "space")
+local appModeTimer = nil
 
---------------------------------------------------------------------------------
--- TOGGLE APP (Hide if active, show if not)
---------------------------------------------------------------------------------
-
--- Toggle function - useful for terminal/notes
-function toggleApp(appName)
-  local app = hs.application.find(appName)
-  if app and app:isFrontmost() then
-    app:hide()
-  else
-    hs.application.launchOrFocus(appName)
+local function stopAppModeTimer()
+  if appModeTimer then
+    appModeTimer:stop()
+    appModeTimer = nil
   end
 end
 
--- Create toggle hotkeys for all apps using Cmd+Alt+Shift+Key
-for key, app in pairs(apps) do
-  hs.hotkey.bind({"cmd", "alt", "shift"}, key, function()
-    toggleApp(app)
+appMode.entered = function()
+  stopAppModeTimer()
+  print("App mode entered")
+  appModeTimer = hs.timer.doAfter(2, function()
+    appModeTimer = nil
+    appMode:exit()
   end)
 end
+
+appMode.exited = function()
+  stopAppModeTimer()
+  print("App mode exited")
+end
+
+for key, app in pairs(apps) do
+  appMode:bind({}, key, function()
+    hs.application.launchOrFocus(app)
+    appMode:exit()
+  end)
+end
+
+appMode:bind({}, "escape", function()
+  appMode:exit()
+end)
 
 --------------------------------------------------------------------------------
 -- ZOOM AUDIO TOGGLE
 --------------------------------------------------------------------------------
 
--- Map Hyper+E to Cmd+Shift+A.
+-- Map true Hyper+E to Cmd+Shift+A.
 -- With Zoom's native global shortcut enabled for mute/unmute, this toggles audio
 -- without activating Zoom or changing focus.
 local function sendZoomAudioShortcut()
@@ -115,15 +126,15 @@ local function sendZoomAudioShortcut()
   hs.notify.new({title="Zoom", informativeText="Audio shortcut sent"}):send()
 end
 
-hs.hotkey.bind({"cmd", "alt", "shift"}, "E", sendZoomAudioShortcut)
+hs.hotkey.bind(hyper, "E", sendZoomAudioShortcut)
 
 --------------------------------------------------------------------------------
 -- ZOOM VIDEO TOGGLE
 --------------------------------------------------------------------------------
 
--- Toggle Zoom video (on/off) with Hyper + Y
--- Works even when Zoom is not the active app
-hs.hotkey.bind({"cmd", "alt", "shift"}, "Y", function()
+-- Toggle Zoom video (on/off) with true Hyper+Y.
+-- Works even when Zoom is not the active app.
+hs.hotkey.bind(hyper, "Y", function()
   -- Try multiple possible Zoom identifiers
   local zoom = hs.application.find("zoom.us") or
                hs.application.find("Zoom") or

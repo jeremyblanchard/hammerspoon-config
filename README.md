@@ -6,9 +6,10 @@ Personal Hammerspoon configuration for macOS automation, window management, and 
 
 - **Smooth Scrolling**: Keyboard-based scrolling with `Ctrl+Cmd+Opt+Arrow` keys
 - **Window Management**: Move windows between monitors with `Alt+Ctrl+Up/Down`
-- **App Switching**: Quick app launcher with `Cmd+Alt+[Key]`
-- **Toggle Apps**: Hide/show apps with `Cmd+Alt+Shift+[Key]`
-- **Zoom Audio Toggle**: `Cmd+Alt+Shift+E` / Hyper+E maps to `Cmd+Shift+A` for Zoom's native global mute/unmute shortcut
+- **App Switching**: Press `Hyper+Space`, release, then press an app key to launch or focus it
+- **Zoom Audio Toggle**: `Hyper+E` maps to `Cmd+Shift+A` for Zoom's native global mute/unmute shortcut
+- **Zoom Video Toggle**: `Hyper+Y` toggles Zoom video without leaving the current app
+- **True Hyper**: The keyboard's held Tab key sends `Cmd+Ctrl+Alt+Shift`
 - **Config Reload**: `Cmd+Alt+Ctrl+R` to reload configuration
 
 ## Installation
@@ -35,8 +36,8 @@ Personal Hammerspoon configuration for macOS automation, window management, and 
 Edit `apps-work.lua` or `apps-personal.lua`:
 ```lua
 return {
-  ["H"] = "Google Chrome",  -- Cmd+Alt+H
-  ["T"] = "Slack",          -- Cmd+Alt+T
+  ["H"] = "Google Chrome",  -- Hyper+Space, then H
+  ["T"] = "Slack",          -- Hyper+Space, then T
   -- Add more apps...
 }
 ```

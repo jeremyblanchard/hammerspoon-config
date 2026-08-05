@@ -11,5 +11,6 @@ return {
   ["X"] = "Xcode",
   ["C"] = "Finder",
   ["V"] = "Notion Calendar",
-  ["B"] = "System Settings"
+  ["B"] = "System Settings",
+  ["O"] = "Obsidian"
 }
